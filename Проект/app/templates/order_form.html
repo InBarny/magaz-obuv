@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Магазин обуви{% endblock %}
+
+{% block content %}
+<div class="order-form-page">
+    <h2>{{ title }}</h2>
+
+    <form method="POST" class="order-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="user_id">Клиент *</label>
+                <select id="user_id" name="user_id" required>
+                    <option value="">Выберите клиента</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}"
+                            {% if order and order.user_id == user.id %}selected{% endif %}>
+                        {{ user.fio }} ({{ user.login }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="status">Статус</label>
+                <select id="status" name="status">
+                    <option value="новый" {% if order and order.status == 'новый' %}selected{% endif %}>Новый</option>
+                    <option value="в_работе" {% if order and order.status == 'в_работе' %}selected{% endif %}>В работе</option>
+                    <option value="выполнен" {% if order and order.status == 'выполнен' %}selected{% endif %}>Выполнен</option>
+                    <option value="отменён" {% if order and order.status == 'отменён' %}selected{% endif %}>Отменён</option>
+                </select>
+            </div>
+        </div>
+
+        <h3>Товары в заказе</h3>
+        <div id="order-items">
+            {% if order and order.items %}
+                {% for item in order.items %}
+                <div class="order-item-row">
+                    <div class="form-group">
+                        <select name="product_id[]" required>
+                            <option value="">Выберите товар</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}" {% if item.product_id == product.id %}selected{% endif %}>
+                                {{ product.name }} — {{ product.final_price }} руб.
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="quantity[]" min="1" value="{{ item.quantity }}" required placeholder="Количество">
+                    </div>
+                    <button type="button" class="btn btn-delete" onclick="this.parentElement.remove()">Удалить</button>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="order-item-row">
+                    <div class="form-group">
+                        <select name="product_id[]" required>
+                            <option value="">Выберите товар</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">
+                                {{ product.name }} — {{ product.final_price }} руб.
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" name="quantity[]" min="1" value="1" required placeholder="Количество">
+                    </div>
+                    <button type="button" class="btn btn-delete" onclick="this.parentElement.remove()">Удалить</button>
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="button" class="btn btn-secondary" onclick="addItem()">+ Добавить товар</button>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <a href="{{ url_for('orders.order_list') }}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function addItem() {
+    const container = document.getElementById('order-items');
+    const row = document.createElement('div');
+    row.className = 'order-item-row';
+    row.innerHTML = `
+        <div class="form-group">
+            <select name="product_id[]" required>
+                <option value="">Выберите товар</option>
+                {% for product in products %}
+                <option value="{{ product.id }}">
+                    {{ product.name }} — {{ product.final_price }} руб.
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="number" name="quantity[]" min="1" value="1" required placeholder="Количество">
+        </div>
+        <button type="button" class="btn btn-delete" onclick="this.parentElement.remove()">Удалить</button>
+    `;
+    container.appendChild(row);
+}
+</script>
+{% endblock %}

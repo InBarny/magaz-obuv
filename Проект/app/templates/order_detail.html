@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Заказ №{{ order.id }} - Магазин обуви{% endblock %}
+
+{% block content %}
+<div class="order-detail-page">
+    <h2>Заказ №{{ order.id }}</h2>
+    
+    <div class="order-info">
+        <p><strong>Клиент:</strong> {{ order.user.fio }}</p>
+        <p><strong>Дата:</strong> {{ order.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        <p><strong>Статус:</strong> 
+            <span class="status status-{{ order.status }}">{{ order.status }}</span>
+        </p>
+        <p><strong>Итого:</strong> {{ order.total_price }} руб.</p>
+    </div>
+    
+    <h3>Состав заказа</h3>
+    <table class="order-items-table">
+        <thead>
+            <tr>
+                <th>Товар</th>
+                <th>Цена</th>
+                <th>Количество</th>
+                <th>Сумма</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.price }} руб.</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.price * item.quantity }} руб.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div class="form-actions">
+        <a href="{{ url_for('orders.order_list') }}" class="btn btn-secondary">Назад к списку</a>
+    </div>
+</div>
+{% endblock %}

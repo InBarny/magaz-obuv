@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Магазин обуви{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="{{ url_for('products.product_list') }}">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Логотип">
+                </a>
+                <h1>Магазин обуви</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="{{ url_for('products.product_list') }}">Товары</a></li>
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.has_permission('view_orders') %}
+                        <li><a href="{{ url_for('orders.order_list') }}">Заказы</a></li>
+                        {% endif %}
+                        {% if current_user.has_permission('add_product') %}
+                        <li><a href="{{ url_for('products.add_product') }}">Добавить товар</a></li>
+                        {% endif %}
+                        <li class="user-info">
+                            <span>{{ current_user.fio }}</span>
+                            <a href="{{ url_for('auth.logout') }}" class="btn-logout">Выход</a>
+                        </li>
+                    {% else %}
+                        <li><a href="{{ url_for('auth.login') }}">Вход</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                        <button type="button" class="close-alert" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Магазин обуви</p>
+        </div>
+    </footer>
+</body>
+</html>
